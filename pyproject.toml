@@ -1,0 +1,19 @@
+[project]
+package-mode = false
+name = "goit-pythonweb-hw-03"
+version = "0.1.0"
+description = "hw-3"
+authors = [
+    {name = "Olha Shapoval",email = "belyaevaolya0@gmail.com"}
+]
+readme = "README.md"
+
+requires-python = ">=3.11"
+dependencies = [
+    "jinja2 (>=3.1.6,<4.0.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
