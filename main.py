@@ -26,6 +26,7 @@ jinja.filters['format_datetime'] = format_datetime
 class HttpHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         pr_url = urllib.parse.urlparse(self.path)
+        print(f"Requested path: {pr_url.path}") 
         if pr_url.path == '/':
             self.send_html_file('index.html')
         elif pr_url.path == '/message':
@@ -67,7 +68,7 @@ class HttpHandler(BaseHTTPRequestHandler):
         self.send_response(status)
         self.send_header('Content-type', 'text/html')
         self.end_headers()
-        with open(filename, 'rb') as fd:
+        with open(f'templates/{filename}', 'rb') as fd:
             self.wfile.write(fd.read())
 
     def render_template(self, filename, status=200):
@@ -83,15 +84,17 @@ class HttpHandler(BaseHTTPRequestHandler):
         self.wfile.write(content.encode())
 
     def send_static(self):
-        self.send_response(200)
-        mt = mimetypes.guess_type(self.path)
-        if mt:
-            self.send_header("Content-type", mt[0])
+        file_path = pathlib.Path().joinpath(self.path[1:])
+
+        if file_path.exists():
+            self.send_response(200)
+            mt = mimetypes.guess_type(file_path)
+            self.send_header("Content-type", mt[0] if mt else 'text/plain')
+            self.end_headers()
+            with open(file_path, 'rb') as file:
+                self.wfile.write(file.read())
         else:
-            self.send_header("Content-type", 'text/plain')
-        self.end_headers()
-        with open(f'.{self.path}', 'rb') as file:
-            self.wfile.write(file.read())
+            self.send_html_file('error.html', 404)
 
 def run(server_class=HTTPServer, handler_class=HttpHandler):
     server_address = ('', 3000)
